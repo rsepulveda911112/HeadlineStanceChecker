@@ -1,23 +1,36 @@
 import os
 import pandas as pd
 import numpy as np
+import wandb
 from sklearn.metrics import accuracy_score
 from model.out_simple_transformer.ClassificationModel import ClassificationModel
 
 
-def train_predict_model(df_train, df_test, is_predict, use_cuda, value_head):
+def train_predict_model(df_train, df_test, is_predict, use_cuda, value_head, wandb_project=None, wandb_config=None):
     df_train = df_train.sample(frac=1)
     labels = list(df_train['labels'].unique())
     labels.sort()
+
+    if wandb_project:
+        if wandb_config != None:
+            wandb.init(config=wandb_config, project=wandb_project)
+        else:
+            wandb.init(config=wandb.config, project=wandb_project)
+        wandb_config = wandb.config
+    else:
+        wandb_config = dict()
 
     model = ClassificationModel('roberta', 'roberta-large',
              num_labels=len(labels), use_cuda=use_cuda, args={
             'learning_rate': 1e-5, 'num_train_epochs': 3,
             'reprocess_input_data': True, 'overwrite_output_dir': True,
-            'process_count': 10, 'train_batch_size': 4,
+            'process_count': 10, 'train_batch_size': 2,
             'eval_batch_size': 4, 'max_seq_length': 512,
             'multiprocessing_chunksize': 500, 'fp16': True,
-            'fp16_opt_level': 'O1', 'value_head': value_head})
+            'fp16_opt_level': 'O1', 'value_head': value_head,
+            'wandb_project': 'wandb_project',
+            'tensorboard_dir': 'tensorboard'})
+    # sweep_config = wandb.config
 
     model.train_model(df_train)
 

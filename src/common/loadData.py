@@ -17,9 +17,11 @@ def load_data(file, feature_name, map_value, type_dataset, type_classify):
         df_in = df_in[df_in['label'] != 'unrelated']
     for index, row in tqdm(df_in.iterrows(), total=len(df_in), desc=f"Load {type_dataset} set"):
         headlines.append(row['sentence1'])
-        body_text = ''
-        for value in row['sentences2']:
-           body_text += value + ' '
+        body_text = row['sentences2']
+        if not isinstance(body_text, str):
+            body_text = ''
+            for value in row['sentences2']:
+                body_text += value + ' '
         bodies.append(body_text)
         labels.append(map_value[row['label']])
         real_labels.append(row['label'])

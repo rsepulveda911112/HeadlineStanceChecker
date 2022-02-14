@@ -1,4 +1,5 @@
 pip install -r requirements.txt
+python -m spacy download en_core_web_lg
 apt-get -y update
 apt-get install git
 apt-get install wget

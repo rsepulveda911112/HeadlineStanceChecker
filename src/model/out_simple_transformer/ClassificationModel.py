@@ -124,11 +124,7 @@ class ClassificationModel():
 
             sweep_values = {key: value for key, value in sweep_config.as_dict().items() if key != "_wandb"}
             self.args.update_from_dict(sweep_values)
-        if not self.args.manual_seed:
-            if num_labels == 2:
-                self.args.manual_seed = 3555
-            elif num_labels == 3:
-                self.args.manual_seed = 2394
+        
 
         if self.args.manual_seed:
             random.seed(self.args.manual_seed)

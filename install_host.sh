@@ -8,6 +8,7 @@ cd ..//
 pip3 install --upgrade pip
 pip3 install torch==1.8.1
 pip3 install -r requirements.txt
+python -m spacy download en_core_web_lg
 
 apt-get install git
 apt-get install wget

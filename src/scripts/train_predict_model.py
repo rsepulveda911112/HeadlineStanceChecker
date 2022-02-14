@@ -3,6 +3,8 @@ from common.loadData import load_data
 from model.roberta.roberta_model import train_predict_model, predict_task
 import pandas as pd
 from common.score import scorePredict
+import wandb
+import random
 
 
 def main(parser):
@@ -13,6 +15,13 @@ def main(parser):
     model_dir = args.model_dir
     type_classify = args.type_classify
     features_1_stage = args.features_1_stage
+    features_2_stage = args.features_2_stage
+    wandb_name = args.wandb_project
+    sweep_config = args.sweep_config
+    exec_model(training_set, test_set, use_cuda, model_dir, type_classify, features_1_stage, wandb_name, sweep_config)
+    
+
+def exec_model(training_set, test_set, use_cuda, model_dir, type_classify, features_1_stage, wandb_name=None, sweep_config=None):
 
     features = features_1_stage
     if type_classify == 'related':
@@ -27,7 +36,8 @@ def main(parser):
     df_test = load_data(test_set, features, label_map, 'test', type_classify)
 
     if model_dir == '':
-        _, y_predict = train_predict_model(df_train, df_test, True, use_cuda, len(features))
+        # wandb.init(project='HeadlineStanceChecker_text_rank', entity='rsepulveda')
+        _, y_predict = train_predict_model(df_train, df_test, True, use_cuda, len(features), wandb_name, sweep_config)
     else:
         y_predict = predict_task(df_test, use_cuda, model_dir, len(features))
 
@@ -35,6 +45,7 @@ def main(parser):
     labels = list(df_test['labels'].unique())
     labels.sort()
     result, f1 = scorePredict(y_predict, labels_test, labels)
+    print(value_seed)
     print(result)
 
 
@@ -71,5 +82,20 @@ if __name__ == '__main__':
                         default=[],
                         nargs='+',
                         help="This parameter is the features of model first stage for predict.")
+
+    parser.add_argument("--features_2_stage",
+                        default=[],
+                        nargs='+',
+                        help="This parameter is the features of model second stage for predict.")
+
+    parser.add_argument("--wandb_project",
+                        default="",
+                        type=str,
+                        help="This parameter is the name of wandb project.")
+
+    parser.add_argument("--sweep_config",
+                        default="",
+                        type=str,
+                        help="This parameter is the hyperparameters configuration.")
 
     main(parser)

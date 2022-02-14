@@ -9,7 +9,7 @@ The code to train the models together with the generated summaries are available
 
 You can use this code in your host environment or in a docker container.
 ### Requirements
-* Python 3.6
+* Python >= 3.6
 * Pytorch >= 1.6
 * Transformers >= 4.6.1
 * Linux OS or Docker
@@ -91,6 +91,21 @@ docker run --name name_container -it --net=host -v folder_dir_with_code:/workspa
 These commands should be executed into the code folder.
 ### Description of scripts
 
+##### Preprocess dataset
+
+If you want obtain summary and features you will use preprocess_dataset.py
+In this case, TextRank summarizer is used because PLM summarizer does not have package implementation. 
+
+These parameters allow to configure the system to preprocess.
+
+|Field|Description|
+|---|---|
+|dataset_in|This parameter is the relative dir of dataset.|
+|dataset_out|This parameter can be used if cuda is present.|
+
+If you use this script to preprocess, you cannot use max_score_in_position feature because it is PLM summary feature based.
+
+
 ##### Train and predict models
 If you want train and predict your model you will use train_predict_model.py
 
@@ -104,7 +119,10 @@ These parameters allow to configure the system to train or predict.
 |test_set|This parameter is the relative directory of the test set.|
 |model_dir|This parameter is the relative directory of the model for prediction.|
 |features_1_stage|This parameter contains the features of the model for the first stage of prediction (cosineSimilarity, max_score_in_position, overlap, spacySimilarity, jaccardScore, hellingerScore, kullback_leiblerScore).|
+|wandb_project|This parameter is the name of wandb project.|
+|sweep_config|This parameter is the hyperparameters configuration.|
 
+You can create an account at https://wandb.ai/ to monitor your training. 
 
 For example, if you want to train and predict "stance" as the type of classifier:
 ```bash
@@ -150,9 +168,55 @@ PYTHONPATH=src python src/scripts/predict_stance_model.py --model_dir_1_stage "/
 
 Note: If you don't have GPU remove "--use_cuda" in the commands
 
+
+##### Optimize hyperparameters and initialize seed
+
+In addition, you can use this library to optimize hyperparameters. We found that the seed of initialization affects the training process, then we include it in the hyperparameter optimization. For example:
+
+``` bash
+method: bayes
+metric:
+  goal: minimize
+  name: train_loss
+parameters:
+  batch_size:
+    values: [2, 4, 8]
+  dropout:
+    values: [0.1, 0.2, 0.3]
+  learning_rate:
+    max: 5e-05
+    min: 1e-05
+  num_train_epochs:
+    max: 6
+    min: 2
+  manual_seed:
+    distribution: int_uniform
+    max: 1000
+    min: 0
+  program: sweep_roberta.py
+
+```
+ You can consult https://docs.wandb.ai/guides/sweeps/quickstart to create sweeps. In sweep_roberta.py you have an example of sweep execution. 
+
 ### Contacts:
 If you have any questions please contact the authors.   
   * Robiert Sepúlveda Torres rsepulveda911112@gmail.com 
+
+### Citation:
+```bash
+@article{SEPULVEDATORRES2021100660,
+title = {HeadlineStanceChecker: Exploiting summarization to detect headline disinformation},
+journal = {Journal of Web Semantics},
+volume = {71},
+pages = {100660},
+year = {2021},
+issn = {1570-8268},
+doi = {https://doi.org/10.1016/j.websem.2021.100660},
+url = {https://www.sciencedirect.com/science/article/pii/S1570826821000354},
+author = {Robiert Sepúlveda-Torres and Marta Vicente and Estela Saquete and Elena Lloret and Manuel Palomar},
+keywords = {Natural Language Processing, Fake news, Misleading headlines, Stance detection, Applied computing, Document management and text processing, Semantic summarization},
+}
+```
   
 ### License:
   * Apache License Version 2.0 
