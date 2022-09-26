@@ -98,10 +98,10 @@ In this case, TextRank summarizer is used because PLM summarizer does not have p
 
 These parameters allow to configure the system to preprocess.
 
-|Field|Description|
-|---|---|
-|dataset_in|This parameter is the relative dir of dataset.|
-|dataset_out|This parameter can be used if cuda is present.|
+|Field| Description                                           |
+|---|-------------------------------------------------------|
+|dataset_in| This parameter is the relative input dir of dataset.  |
+|dataset_out| This parameter is the relative output dir of dataset. |
 
 If you use this script to preprocess, you cannot use max_score_in_position feature because it is PLM summary feature based.
 

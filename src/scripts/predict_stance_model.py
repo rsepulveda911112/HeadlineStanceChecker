@@ -12,8 +12,9 @@ def main(parser):
     model_dir_1_stage = args.model_dir_1_stage
     model_dir_2_stage = args.model_dir_2_stage
     features_1_stage = args.features_1_stage
-
-
+    features_2_stage = args.features_2_stage
+    
+        
     label_map = {'unrelated': 3, 'agree': 0, 'disagree': 1, 'discuss': 2}
     df_test = load_data(test_set, features_1_stage, label_map, 'test', '')
 

@@ -37,7 +37,7 @@ def exec_model(training_set, test_set, use_cuda, model_dir, type_classify, featu
 
     if model_dir == '':
         # wandb.init(project='HeadlineStanceChecker_text_rank', entity='rsepulveda')
-        _, y_predict = train_predict_model(df_train, df_test, True, use_cuda, len(features), wandb_name, sweep_config)
+        _, y_predict = train_predict_model(df_train, df_test, True, True, use_cuda, len(features), wandb_name, sweep_config)
     else:
         y_predict = predict_task(df_test, use_cuda, model_dir, len(features))
 
